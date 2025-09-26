@@ -28,6 +28,27 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+# Patch unstable boost download URL to stable archives mirror to avoid checksum failures
+pre_install do |installer|
+  begin
+    boost_podspec = File.join(__dir__, '..', 'node_modules', 'react-native', 'third-party-podspecs', 'boost.podspec')
+    if File.exist?(boost_podspec)
+      contents = File.read(boost_podspec)
+      patched = contents.gsub('https://boostorg.jfrog.io/artifactory/main/release', 'https://archives.boost.io/release')
+      if patched != contents
+        File.open(boost_podspec, 'w') { |f| f.write(patched) }
+        Pod::UI.puts "✅ Patched boost.podspec to use archives.boost.io".green
+      else
+        Pod::UI.puts "ℹ️ boost.podspec already uses archives.boost.io".yellow
+      end
+    else
+      Pod::UI.puts "⚠️ boost.podspec not found at #{boost_podspec}".yellow
+    end
+  rescue => e
+    Pod::UI.puts "⚠️ Failed to patch boost.podspec: #{e}".yellow
+  end
+end
+
 target 'HelloWorld' do
   config = use_native_modules!
 
