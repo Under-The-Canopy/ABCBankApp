@@ -3,11 +3,11 @@ name: Build iOS App
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   build-ios:
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
     - name: Checkout repository
@@ -21,70 +21,73 @@ jobs:
 
     - name: Install dependencies
       run: |
-        npm ci
+        npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
-    - name: Setup Ruby
+    - name: Setup Ruby and Bundler
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.0'
+        bundler-cache: false
 
-    - name: Install CocoaPods
+    - name: Install CocoaPods (Simple Method)
       run: |
         cd ios
-        bundle init
-        echo 'gem "cocoapods", "~> 1.12"' >> Gemfile
-        bundle install
-        bundle exec pod install --verbose
+        # 删除可能存在的锁定文件
+        rm -f Podfile.lock
+        rm -rf Pods
+
+        # 使用系统CocoaPods直接安装
+        sudo gem install cocoapods
+        pod --version
+
+        # 更新repo并安装
+        pod repo update
+        pod install --verbose
 
     - name: Build iOS App
       run: |
         cd ios
-        # 构建用于模拟器的版本
-        xcodebuild -workspace ABCBankApp.xcworkspace \
-                   -scheme ABCBankApp \
-                   -configuration Release \
-                   -destination 'platform=iOS Simulator,name=iPhone 14' \
-                   -derivedDataPath ./build \
-                   build
+        # 检查workspace是否存在
+        if [ -f "ABCBankApp.xcworkspace" ]; then
+          echo "Using xcworkspace"
+          xcodebuild -workspace ABCBankApp.xcworkspace \
+                     -scheme ABCBankApp \
+                     -configuration Release \
+                     -destination 'platform=iOS Simulator,name=iPhone 14' \
+                     -derivedDataPath ./build \
+                     clean build
+        else
+          echo "Using xcodeproj"
+          xcodebuild -project ABCBankApp.xcodeproj \
+                     -scheme ABCBankApp \
+                     -configuration Release \
+                     -destination 'platform=iOS Simulator,name=iPhone 14' \
+                     -derivedDataPath ./build \
+                     clean build
+        fi
 
-    - name: Create Archive
+    - name: Package App
       run: |
-        cd ios
-        xcodebuild -workspace ABCBankApp.xcworkspace \
-                   -scheme ABCBankApp \
-                   -configuration Release \
-                   -destination 'generic/platform=iOS' \
-                   -archivePath ./ABCBankApp.xcarchive \
-                   archive || echo "Archive failed, but continuing..."
+        cd ios/build/Build/Products/Release-iphonesimulator/
+        if [ -d "ABCBankApp.app" ]; then
+          zip -r ABCBankApp-Simulator.zip ABCBankApp.app
+          echo "✅ App packaged successfully"
+          ls -la ABCBankApp-Simulator.zip
+        else
+          echo "❌ App build failed - .app file not found"
+          ls -la
+          exit 1
+        fi
 
-    - name: Build for Simulator (Fallback)
-      run: |
-        cd ios
-        xcodebuild -workspace ABCBankApp.xcworkspace \
-                   -scheme ABCBankApp \
-                   -configuration Release \
-                   -destination 'platform=iOS Simulator,name=iPhone 14' \
-                   -derivedDataPath ./build \
-                   clean build
-
-        # 创建.app文件的压缩包
-        cd build/Build/Products/Release-iphonesimulator/
-        zip -r ABCBankApp-Simulator.zip ABCBankApp.app
-
-    - name: Upload Build Artifacts
+    - name: Upload iOS App
       uses: actions/upload-artifact@v4
       with:
-        name: iOS-Build-${{ github.run_number }}
-        path: |
-          ios/ABCBankApp.xcarchive
-          ios/build/Build/Products/Release-iphonesimulator/ABCBankApp-Simulator.zip
+        name: iOS-App-${{ github.run_number }}
+        path: ios/build/Build/Products/Release-iphonesimulator/ABCBankApp-Simulator.zip
         retention-days: 30
 
     - name: Build Summary
       run: |
         echo "✅ iOS构建完成!"
-        echo "📱 构建产物已上传到Artifacts"
-        echo "📂 下载方式: Actions页面 → 本次构建 → Artifacts"
-        echo "🔧 包含文件:"
-        echo "   - ABCBankApp.xcarchive (真机版本)"
-        echo "   - ABCBankApp-Simulator.zip (模拟器版本)"
+        echo "📱 应用已打包为模拟器版本"
+        echo "📂 下载: Actions → 本次构建 → Artifacts"
