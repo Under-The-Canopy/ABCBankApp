@@ -262,20 +262,18 @@ jobs:
           mkdir -p ABCBankApp-Demo.app
 
           # 添加应用信息
-          cat > ABCBankApp-Demo.app/Info.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleDisplayName</key>
-    <string>农业银行演示应用</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.abcbank.demo</string>
-    <key>CFBundleVersion</key>
-    <string>1.0</string>
-</dict>
-</plist>
-EOF
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > ABCBankApp-Demo.app/Info.plist
+          echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> ABCBankApp-Demo.app/Info.plist
+          echo '<plist version="1.0">' >> ABCBankApp-Demo.app/Info.plist
+          echo '<dict>' >> ABCBankApp-Demo.app/Info.plist
+          echo '    <key>CFBundleDisplayName</key>' >> ABCBankApp-Demo.app/Info.plist
+          echo '    <string>农业银行演示应用</string>' >> ABCBankApp-Demo.app/Info.plist
+          echo '    <key>CFBundleIdentifier</key>' >> ABCBankApp-Demo.app/Info.plist
+          echo '    <string>com.abcbank.demo</string>' >> ABCBankApp-Demo.app/Info.plist
+          echo '    <key>CFBundleVersion</key>' >> ABCBankApp-Demo.app/Info.plist
+          echo '    <string>1.0</string>' >> ABCBankApp-Demo.app/Info.plist
+          echo '</dict>' >> ABCBankApp-Demo.app/Info.plist
+          echo '</plist>' >> ABCBankApp-Demo.app/Info.plist
 
           # 复制React Native bundle
           if [ -f "main.jsbundle" ]; then
