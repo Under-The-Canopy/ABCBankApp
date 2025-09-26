@@ -29,16 +29,23 @@ jobs:
         ruby-version: '3.0'
         bundler-cache: false
 
-    - name: Install CocoaPods (Simple Method)
+    - name: Install CocoaPods (Enhanced Method)
       run: |
         cd ios
         # 删除可能存在的锁定文件
         rm -f Podfile.lock
         rm -rf Pods
 
+        # 显示项目结构
+        echo "📂 iOS project structure:"
+        ls -la
+
         # 使用系统CocoaPods直接安装
         sudo gem install cocoapods
         pod --version
+
+        # 创建项目文件引用（如果需要）
+        echo "project 'ABCBankApp.xcodeproj'" > Podfile.project
 
         # 更新repo并安装
         pod repo update
