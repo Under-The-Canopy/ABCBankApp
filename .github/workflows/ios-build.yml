@@ -32,9 +32,10 @@ jobs:
     - name: Install CocoaPods (Enhanced Method)
       run: |
         cd ios
-        # 删除可能存在的锁定文件
+        # 删除可能存在的锁定文件和缓存
         rm -f Podfile.lock
         rm -rf Pods
+        rm -rf ~/Library/Caches/CocoaPods || true
 
         # 显示项目结构
         echo "📂 iOS project structure:"
@@ -44,12 +45,29 @@ jobs:
         sudo gem install cocoapods
         pod --version
 
-        # 创建项目文件引用（如果需要）
-        echo "project 'ABCBankApp.xcodeproj'" > Podfile.project
+        # 清理CocoaPods缓存
+        pod cache clean --all
 
-        # 更新repo并安装
-        pod repo update
-        pod install --verbose
+        # 更新repo
+        pod repo update --verbose
+
+        # 尝试安装，如果失败则重试
+        for i in 1 2 3; do
+          echo "🔄 CocoaPods安装尝试 #$i"
+          if pod install --verbose --clean-install; then
+            echo "✅ CocoaPods安装成功"
+            break
+          else
+            echo "❌ 安装失败，清理缓存后重试..."
+            pod cache clean --all
+            rm -rf Pods
+            if [ $i -eq 3 ]; then
+              echo "💥 CocoaPods安装失败，尝试使用--repo-update"
+              pod install --verbose --repo-update
+            fi
+            sleep 10
+          fi
+        done
 
     - name: Build iOS App
       run: |
