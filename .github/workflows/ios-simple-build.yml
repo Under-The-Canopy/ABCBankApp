@@ -190,6 +190,14 @@ jobs:
           fi
 
           echo "POD_SUCCESS=$POD_SUCCESS" >> $GITHUB_ENV
+
+          # 关键：Pod安装后重新检测workspace，并切换为使用workspace进行构建
+          XCWORKSPACE=$(find . -name "*.xcworkspace" -type d | head -1)
+          if [ -n "$XCWORKSPACE" ]; then
+            echo "✅ Pod安装后检测到workspace: $XCWORKSPACE"
+            echo "XCODE_FILE=$XCWORKSPACE" >> $GITHUB_ENV
+            echo "USE_WORKSPACE=true" >> $GITHUB_ENV
+          fi
         else
           echo "⚠️ 未找到Podfile，跳过CocoaPods安装"
           echo "POD_SUCCESS=true" >> $GITHUB_ENV
