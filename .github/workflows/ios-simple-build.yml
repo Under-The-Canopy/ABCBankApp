@@ -99,14 +99,28 @@ jobs:
           rm -rf Pods
           rm -rf ~/Library/Caches/CocoaPods
 
-          # 检查并修复Podfile中的target名称
-          echo "🔧 检查Podfile中的target名称..."
-          if grep -q "target 'HelloWorld'" Podfile; then
-            echo "⚠️ 发现HelloWorld target，正在修复为ABCBankApp..."
-            sed -i '' "s/target 'HelloWorld'/target 'ABCBankApp'/g" Podfile
-            sed -i '' "s/target 'HelloWorldTests'/target 'ABCBankAppTests'/g" Podfile
-            echo "✅ Podfile target名称已修复"
+          # 动态检测并同步Podfile的target名称
+          echo "🔧 检查并同步Podfile中的target名称..."
+          TARGETS_RAW=$(xcodebuild -list -project ABCBankApp.xcodeproj 2>/dev/null | sed -n '/Targets:/,/Build Configurations:/p' | grep -v 'Targets:\|Build Configurations:' | xargs)
+          echo "📋 Xcode Targets: $TARGETS_RAW"
+          if echo "$TARGETS_RAW" | grep -q "ABCBankApp"; then
+            TARGET_NAME="ABCBankApp"
+          elif echo "$TARGETS_RAW" | grep -q "HelloWorld"; then
+            TARGET_NAME="HelloWorld"
+          else
+            TARGET_NAME=$(echo "$TARGETS_RAW" | awk '{print $1}')
           fi
+          if [ -z "$TARGET_NAME" ]; then
+            echo "❌ 无法检测Xcode Target"; exit 1
+          fi
+          TEST_TARGET_NAME="${TARGET_NAME}Tests"
+          echo "🎯 使用Target: $TARGET_NAME / $TEST_TARGET_NAME"
+
+          # 将Podfile中的目标名同步为项目中的目标名
+          sed -i '' "s/target 'ABCBankApp'/target '$TARGET_NAME'/g" Podfile || true
+          sed -i '' "s/target 'HelloWorld'/target '$TARGET_NAME'/g" Podfile || true
+          sed -i '' "s/target 'ABCBankAppTests'/target '${TEST_TARGET_NAME}'/g" Podfile || true
+          sed -i '' "s/target 'HelloWorldTests'/target '${TEST_TARGET_NAME}'/g" Podfile || true
 
           # 检查修复后的Podfile内容
           echo "📄 修复后的Podfile内容:"
