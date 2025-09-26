@@ -29,13 +29,17 @@ jobs:
         ruby-version: '3.0'
         bundler-cache: false
 
-    - name: Install CocoaPods (Enhanced Method)
+    - name: Install CocoaPods (No Flipper)
+      env:
+        NO_FLIPPER: 1
       run: |
         cd ios
         # 删除可能存在的锁定文件和缓存
         rm -f Podfile.lock
         rm -rf Pods
-        rm -rf ~/Library/Caches/CocoaPods || true
+
+        echo "🚫 禁用Flipper以避免boost下载问题"
+        echo "NO_FLIPPER=1" >> $GITHUB_ENV
 
         # 显示项目结构
         echo "📂 iOS project structure:"
@@ -45,31 +49,13 @@ jobs:
         sudo gem install cocoapods
         pod --version
 
-        # 清理CocoaPods缓存
-        pod cache clean --all
-
-        # 更新repo
-        pod repo update --verbose
-
-        # 尝试安装，如果失败则重试
-        for i in 1 2 3; do
-          echo "🔄 CocoaPods安装尝试 #$i"
-          if pod install --verbose --clean-install; then
-            echo "✅ CocoaPods安装成功"
-            break
-          else
-            echo "❌ 安装失败，清理缓存后重试..."
-            pod cache clean --all
-            rm -rf Pods
-            if [ $i -eq 3 ]; then
-              echo "💥 CocoaPods安装失败，尝试使用--repo-update"
-              pod install --verbose --repo-update
-            fi
-            sleep 10
-          fi
-        done
+        # 不更新repo，使用本地缓存
+        echo "📦 使用NO_FLIPPER环境变量安装依赖..."
+        pod install --verbose
 
     - name: Build iOS App
+      env:
+        NO_FLIPPER: 1
       run: |
         cd ios
         # 检查workspace是否存在
