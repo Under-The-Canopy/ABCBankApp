@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国农业银行</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background-image: url('../assets/icons/svg/banner-background.svg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+
+        /* Top Icons */
+        .top-icons {
+            display: flex;
+            align-items: center;
+            padding: 20px 16px 12px;
+            gap: 6px;
+            background: transparent;
+        }
+
+        .top-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .icon-container {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .icon-text {
+            font-size: 24px;
+        }
+
+        .top-icon-text {
+            font-size: 11px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .search-container {
+            flex: 1;
+            background: rgba(255,255,255,0.9);
+            border-radius: 16px;
+            padding: 6px 14px;
+            margin: 0 8px;
+            font-size: 15px;
+            color: #8E8E93;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 32px;
+            max-width: none;
+            min-width: 180px;
+        }
+
+        .search-icon {
+            font-size: 16px;
+            color: #8E8E93;
+        }
+
+        .message-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #FF3B30;
+            border-radius: 10px;
+            padding: 2px 6px;
+            min-width: 20px;
+            font-size: 11px;
+            color: white;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Hui You Fu Banner */
+        .banner-container {
+            background: transparent;
+            margin: 0;
+            border-radius: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .banner-left {
+            flex: 1;
+        }
+
+        .banner-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .hui-container {
+            margin-right: 8px;
+        }
+
+        .hui-char {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 900;
+            font-family: 'KaiTi', '楷体', 'STKaiti', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 30%, #CD853F  70%, #D2691E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            border: 3px solid rgba(139, 69, 19, 0.8);
+            border-radius: 50%;
+            width: 65px;
+            height: 65px;
+            text-align: center;
+            transform: skewX(12deg);
+            box-shadow:
+                0 0 15px rgba(139, 69, 19, 0.4),
+                inset 0 0 10px rgba(210, 105, 30, 0.2);
+            position: relative;
+        }
+
+        .hui-char::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(210, 105, 30, 0.3));
+            z-index: -1;
+            filter: blur(2px);
+        }
+
+        .youfu-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .youfu-text {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'STSong', '华文宋体', 'SimSun', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #CD853F 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            transform: skewX(-8deg);
+            text-shadow:
+                2px 2px 4px rgba(139, 69, 19, 0.3),
+                0 0 10px rgba(210, 105, 30, 0.2);
+            letter-spacing: 3px;
+        }
+
+        .banner-subtitle {
+            font-size: 16px;
+            font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', sans-serif;
+            color: #2E8B57;
+            background: linear-gradient(90deg, #228B22 0%, #32CD32 50%, #90EE90 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-shadow: 0 1px 3px rgba(46, 139, 87, 0.2);
+            line-height: 1.4;
+        }
+
+        .banner-button {
+            background: linear-gradient(135deg, #FF8A50, #FF7A40);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 18px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,139,80,0.3);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .banner-button-text {
+            font-weight: bold;
+        }
+
+        .banner-button-arrow {
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .treasure-box {
+            font-size: 64px;
+            margin-left: 12px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.9);
+            margin: 16px 20px;
+            border-radius: 16px;
+            padding: 24px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            gap: 8px;
+        }
+
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .grid-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .grid-svg-icon {
+            width: 28px;
+            height: 28px;
+            filter: brightness(0) invert(1);
+        }
+
+        .grid-text {
+            font-size: 13px;
+            color: #1D1D1F;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .teal { background: linear-gradient(135deg, #1ABC9C, #16A085); }
+        .orange { background: linear-gradient(135deg, #FF9642, #E67E22); }
+
+        /* Services Grid */
+        .services-grid {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            margin: 0;
+            border-radius: 0;
+            padding: 24px 12px;
+            border-top: 1px solid #F2F2F7;
+        }
+
+        .service-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .service-svg-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .service-text {
+            font-size: 12px;
+            color: #1D1D1F;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .new-badge {
+            position: absolute;
+            top: -4px;
+            right: 8px;
+            background: #FF3B30;
+            border-radius: 8px;
+            padding: 2px 4px;
+            font-size: 9px;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Promotion Cards */
+        .promotion-cards {
+            margin: 0;
+            background: white;
+            padding: 0 20px;
+        }
+
+        .promotion-card {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 0;
+            padding: 16px 0;
+            margin-bottom: 0;
+            cursor: pointer;
+            border-bottom: 1px solid #F2F2F7;
+        }
+
+        .promotion-icon {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .promotion-text {
+            flex: 1;
+            font-size: 15px;
+            color: #1D1D1F;
+            font-weight: 500;
+        }
+
+        .promotion-arrow {
+            font-size: 16px;
+            color: #C7C7CC;
+            font-weight: 600;
+        }
+
+        /* Game Banner */
+        .game-banner {
+            background: linear-gradient(135deg, #4FB3D9, #6EC1E4);
+            margin: 20px;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 16px rgba(75,179,217,0.3);
+        }
+
+        .game-banner-content {
+            flex: 1;
+        }
+
+        .game-banner-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .game-banner-button {
+            background: linear-gradient(135deg, #FF8A50, #FF6B35);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 18px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,139,80,0.4);
+        }
+
+        .game-wheel {
+            font-size: 56px;
+            margin-left: 16px;
+        }
+
+        /* Wealth Section */
+        .wealth-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            margin: 20px;
+            padding: 18px 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            cursor: pointer;
+        }
+
+        .wealth-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .wealth-arrow {
+            font-size: 16px;
+            color: #C7C7CC;
+            font-weight: 600;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 6px 0 34px;
+            border-top: 0.5px solid rgba(0,0,0,0.05);
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 375px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding-top: 4px;
+        }
+
+        /* SVG Icon Styles */
+        .svg-icon {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .search-svg-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .voice-svg-icon {
+            width: 16px;
+            height: 16px;
+            margin-left: auto;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .grid-svg-icon {
+            width: 28px;
+            height: 28px;
+            filter: brightness(0) invert(1);
+        }
+        
+        /* 收支图标特殊处理 - 保持原色 */
+        .grid-item .grid-icon img[alt="收支"] {
+            filter: none;
+            width: 28px;
+            height: 28px;
+        }
+
+        .service-svg-icon {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 8px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .nav-svg-icon {
+            width: 20px;
+            height: 20px;
+            margin-bottom: 4px;
+            filter: brightness(0) saturate(100%) invert(44%) sepia(7%) saturate(369%) hue-rotate(314deg) brightness(95%) contrast(88%);
+        }
+
+        .nav-item .nav-svg-icon {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(7%) saturate(369%) hue-rotate(314deg) brightness(95%) contrast(88%);
+        }
+
+        .nav-item:first-child .nav-svg-icon {
+            filter: brightness(0) saturate(100%) invert(64%) sepia(88%) saturate(1142%) hue-rotate(121deg) brightness(96%) contrast(86%);
+        }
+
+        .nav-text {
+            font-size: 11px;
+            color: #8E8E93;
+            font-weight: 500;
+        }
+
+        .nav-text.active {
+            color: #34C759;
+        }
+
+        .scrollable-content {
+            padding-bottom: 100px;
+        }
+
+        /* Promotion SVG Icon Styles */
+        .promotion-svg-icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 14px;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+
+        /* Home Indicator */
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #1D1D1F;
+            border-radius: 3px;
+        }
+
+        /* 律动性动画效果 */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 2px 8px rgba(255,139,80,0.3);
+            }
+            50% {
+                box-shadow: 0 4px 16px rgba(255,139,80,0.6);
+            }
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 1;
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: rotate(180deg) scale(1.1);
+            }
+        }
+
+        /* 应用动画到相关元素 */
+        .hui-char {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .youfu-text {
+            animation: float 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+
+        .banner-button {
+            animation: glow 2.5s ease-in-out infinite;
+            transition: transform 0.2s ease;
+        }
+
+        .banner-button:hover {
+            transform: scale(1.05);
+        }
+
+        .wheat-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .wheat-image {
+            width: 80px;
+            height: auto;
+            max-height: 100px;
+            filter: drop-shadow(2px 2px 6px rgba(212, 175, 55, 0.4));
+            animation: gentle-sway 4s ease-in-out infinite;
+        }
+
+        @keyframes gentle-sway {
+            0%, 100% {
+                transform: rotate(-3deg);
+            }
+            50% {
+                transform: rotate(3deg);
+            }
+        }
+    </style>
+    <script>
+        function goToIncomeExpense() {
+            window.location.href = 'income-expense.html';
+        }
+
+        function goToTransactionManager() {
+            window.location.href = 'transaction-manager.html';
+        }
+
+        function setActiveNavItem(element) {
+            // 移除所有活动状态
+            document.querySelectorAll('.nav-text').forEach(item => {
+                item.classList.remove('active');
+            });
+            // 设置当前项为活动状态
+            element.querySelector('.nav-text').classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="scrollable-content">
+            <!-- Top Icons Row -->
+            <div class="top-icons">
+                <div class="top-icon">
+                    <div class="icon-container">
+                        <img src="../assets/icons/svg/lottery.svg" alt="抽奖" class="svg-icon">
+                    </div>
+                    <div class="top-icon-text">抽奖</div>
+                </div>
+                <div class="search-container">
+                    <img src="../assets/icons/svg/search.svg" alt="搜索" class="search-svg-icon"> 分期借钱
+                    <img src="../assets/icons/svg/voice.svg" alt="语音" class="voice-svg-icon">
+                </div>
+                <div class="top-icon">
+                    <div class="icon-container">
+                        <img src="../assets/icons/svg/version.svg" alt="版本" class="svg-icon">
+                    </div>
+                    <div class="top-icon-text">版本</div>
+                </div>
+                <div class="top-icon">
+                    <div class="icon-container">
+                        <img src="../assets/icons/svg/customer-service.svg" alt="客服" class="svg-icon">
+                    </div>
+                    <div class="top-icon-text">客服</div>
+                </div>
+                <div class="top-icon">
+                    <div class="message-badge">200</div>
+                    <div class="icon-container">
+                        <img src="../assets/icons/svg/message.svg" alt="消息" class="svg-icon">
+                    </div>
+                    <div class="top-icon-text">消息</div>
+                </div>
+            </div>
+
+            <!-- Hui You Fu Banner -->
+            <div class="banner-container">
+                <div class="banner-left">
+                    <div class="banner-title">
+                        <div class="hui-container">
+                            <span class="hui-char">惠</span>
+                        </div>
+                        <div class="youfu-container">
+                            <span class="youfu-text">有福</span>
+                        </div>
+                    </div>
+                    <div class="banner-subtitle">农情无限 惠聚精彩</div>
+                    <button class="banner-button">
+                        <span class="banner-button-text">立即参与</span>
+                        <span class="banner-button-arrow">＞</span>
+                    </button>
+                </div>
+                <div class="wheat-container">
+                    <img src="../assets/icons/svg/maisui.svg" alt="金色麦穗" class="wheat-image">
+                </div>
+            </div>
+
+            <!-- Main Functions Grid -->
+            <div class="main-grid">
+                <div class="grid-item">
+                    <div class="grid-icon teal">
+                        <img src="../assets/icons/svg/account.svg" alt="账户" class="grid-svg-icon">
+                    </div>
+                    <div class="grid-text">我的账户</div>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-icon orange">
+                        <img src="../assets/icons/svg/transfer.svg" alt="转账" class="grid-svg-icon">
+                    </div>
+                    <div class="grid-text">转账</div>
+                </div>
+                <div class="grid-item" onclick="goToIncomeExpense()">
+                    <div class="grid-icon teal">
+                        <img src="../assets/icons/svg/income-expense.svg" alt="收支" class="grid-svg-icon">
+                    </div>
+                    <div class="grid-text">收支</div>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-icon orange">
+                        <img src="../assets/icons/svg/scan.svg" alt="扫一扫" class="grid-svg-icon">
+                    </div>
+                    <div class="grid-text">扫一扫</div>
+                </div>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="services-grid">
+                <div class="service-item">
+                    <img src="../assets/icons/svg/credit-card.svg" alt="信用卡" class="service-svg-icon">
+                    <div class="service-text">信用卡</div>
+                </div>
+                <div class="service-item">
+                    <div class="new-badge">NEW</div>
+                    <img src="../assets/icons/svg/retirement-community.svg" alt="养老社区" class="service-svg-icon">
+                    <div class="service-text">养老社区</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/deposit.svg" alt="存款" class="service-svg-icon">
+                    <div class="service-text">存款</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/financial-product.svg" alt="理财产品" class="service-svg-icon">
+                    <div class="service-text">理财产品</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/loan.svg" alt="贷款" class="service-svg-icon">
+                    <div class="service-text">贷款</div>
+                </div>
+            </div>
+
+            <!-- Life Services Grid -->
+            <div class="services-grid">
+                <div class="service-item">
+                    <img src="../assets/icons/svg/bill-payment.svg" alt="生活缴费" class="service-svg-icon">
+                    <div class="service-text">生活缴费</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/hot-activity.svg" alt="热门活动" class="service-svg-icon">
+                    <div class="service-text">热门活动</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/game-park.svg" alt="小豆乐园" class="service-svg-icon">
+                    <div class="service-text">小豆乐园</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/city-zone.svg" alt="城市专区" class="service-svg-icon">
+                    <div class="service-text">城市专区</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/more.svg" alt="全部" class="service-svg-icon">
+                    <div class="service-text">全部</div>
+                </div>
+            </div>
+
+            <!-- Promotion Cards -->
+            <div class="promotion-cards">
+                <div class="promotion-card">
+                    <img src="../assets/icons/svg/smart-reminder.svg" alt="智能提醒" class="promotion-svg-icon">
+                    <div class="promotion-text">快来试试智能提醒吧～</div>
+                    <div class="promotion-arrow">❯</div>
+                </div>
+                <div class="promotion-card">
+                    <img src="../assets/icons/svg/news.svg" alt="新闻" class="promotion-svg-icon">
+                    <div class="promotion-text">大爆发！两大利好来袭！</div>
+                    <div class="promotion-arrow">❯</div>
+                </div>
+            </div>
+
+            <!-- Lottery Wheel Banner -->
+            <div style="margin: 20px; text-align: center;">
+                <img src="../assets/icons/svg/lottery-wheel.svg" alt="抽奖转盘" style="width: 100%; max-width: 320px; height: auto;">
+            </div>
+
+            <!-- Wealth Selection -->
+            <div class="wealth-section">
+                <div class="wealth-title">财富优选</div>
+                <div class="wealth-arrow">❯</div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <img src="../assets/icons/svg/home.svg" alt="首页" class="nav-svg-icon">
+                <div class="nav-text active">首页</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/wealth.svg" alt="财富" class="nav-svg-icon">
+                <div class="nav-text">财富</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/life.svg" alt="生活" class="nav-svg-icon">
+                <div class="nav-text">生活</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/rural-revitalization.svg" alt="乡村振兴" class="nav-svg-icon">
+                <div class="nav-text">乡村振兴</div>
+            </div>
+            <div class="nav-item" onclick="goToTransactionManager(); setActiveNavItem(this);">
+                <img src="../assets/icons/svg/profile.svg" alt="我的" class="nav-svg-icon">
+                <div class="nav-text">我的</div>
+            </div>
+        </div>
+
+        <!-- Home Indicator -->
+        <div class="home-indicator"></div>
+    </div>
+</body>
+</html>

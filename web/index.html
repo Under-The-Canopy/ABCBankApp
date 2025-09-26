@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国农业银行APP - 界面预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #00BFFF 0%, #87CEEB 50%, #F0F8FF 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px 5px;
+            color: white;
+        }
+
+        .time-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-text {
+            font-size: 12px;
+        }
+
+        .battery {
+            width: 24px;
+            height: 12px;
+            border: 1px solid white;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .battery-level {
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            bottom: 1px;
+            width: 80%;
+            background: white;
+            border-radius: 1px;
+        }
+
+        .top-icons {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            gap: 5px;
+        }
+
+        .top-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin: 0 5px;
+        }
+
+        .icon-text {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .top-icon-text {
+            font-size: 10px;
+            color: white;
+            margin-top: 2px;
+        }
+
+        .search-container {
+            flex: 1;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 0 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .message-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF4444;
+            border-radius: 10px;
+            padding: 1px 5px;
+            min-width: 20px;
+            font-size: 10px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .banner-container {
+            background: rgba(255,255,255,0.9);
+            margin: 15px;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .banner-left {
+            flex: 1;
+        }
+
+        .banner-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .banner-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .banner-button {
+            background: #FF8A50;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .treasure-box {
+            font-size: 60px;
+            position: relative;
+        }
+
+        .main-grid {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.9);
+            margin: 0 15px;
+            border-radius: 12px;
+            padding: 20px 0;
+        }
+
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .grid-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .grid-text {
+            font-size: 12px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .services-grid {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.9);
+            margin: 10px 15px;
+            border-radius: 12px;
+            padding: 20px 0;
+        }
+
+        .service-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .service-icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .service-text {
+            font-size: 11px;
+            color: #333;
+        }
+
+        .new-badge {
+            position: absolute;
+            top: -5px;
+            right: 10px;
+            background: #FF4444;
+            border-radius: 8px;
+            padding: 1px 4px;
+            font-size: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .promotion-cards {
+            margin: 15px;
+        }
+
+        .promotion-card {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .promotion-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .promotion-text {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .promotion-arrow {
+            font-size: 16px;
+            color: #999;
+        }
+
+        .game-banner {
+            background: linear-gradient(135deg, #4FB3D9, #6EC1E4);
+            margin: 15px;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .game-banner-content {
+            flex: 1;
+        }
+
+        .game-banner-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .game-banner-button {
+            background: #FF8A50;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .game-wheel {
+            font-size: 50px;
+            position: relative;
+        }
+
+        .wealth-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.9);
+            margin: 15px;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .wealth-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .wealth-arrow {
+            font-size: 16px;
+            color: #999;
+        }
+
+        .bottom-nav {
+            display: flex;
+            background: white;
+            padding: 10px 0;
+            border-top: 1px solid #E0E0E0;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 375px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-text {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .nav-text.active {
+            color: #1ABC9C;
+        }
+
+        .scrollable-content {
+            padding-bottom: 80px;
+        }
+
+        .teal { background: #1ABC9C; }
+        .orange { background: #FF9642; }
+
+        /* SVG Icon Styles */
+        .svg-icon {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .search-svg-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .grid-svg-icon {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .service-svg-icon {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 8px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .nav-svg-icon {
+            width: 20px;
+            height: 20px;
+            margin-bottom: 4px;
+            filter: brightness(0) saturate(100%) invert(44%) sepia(7%) saturate(369%) hue-rotate(314deg) brightness(95%) contrast(88%);
+        }
+
+        .nav-item .nav-svg-icon {
+            filter: brightness(0) saturate(100%) invert(44%) sepia(7%) saturate(369%) hue-rotate(314deg) brightness(95%) contrast(88%);
+        }
+
+        .nav-item:first-child .nav-svg-icon {
+            filter: brightness(0) saturate(100%) invert(64%) sepia(88%) saturate(1142%) hue-rotate(121deg) brightness(96%) contrast(86%);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="scrollable-content">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="time-text">14:16</div>
+                <div class="status-icons">
+                    <div class="signal-text">••••• 5G</div>
+                    <div class="battery">
+                        <div class="battery-level"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Icons Row -->
+            <div class="top-icons">
+                <div class="top-icon">
+                    <img src="../assets/icons/svg/lottery.svg" alt="抽奖" class="svg-icon">
+                    <div class="top-icon-text">抽奖</div>
+                </div>
+                <div class="search-container">
+                    <img src="../assets/icons/svg/search.svg" alt="搜索" class="search-svg-icon"> 分期借钱
+                </div>
+                <div class="top-icon">
+                    <img src="../assets/icons/svg/voice.svg" alt="语音" class="svg-icon">
+                </div>
+                <div class="top-icon">
+                    <img src="../assets/icons/svg/version.svg" alt="版本" class="svg-icon">
+                    <div class="top-icon-text">版本</div>
+                </div>
+                <div class="top-icon">
+                    <img src="../assets/icons/svg/customer-service.svg" alt="客服" class="svg-icon">
+                    <div class="top-icon-text">客服</div>
+                </div>
+                <div class="top-icon">
+                    <div class="message-badge">200</div>
+                    <img src="../assets/icons/svg/message.svg" alt="消息" class="svg-icon">
+                    <div class="top-icon-text">消息</div>
+                </div>
+            </div>
+
+            <!-- Hui You Fu Banner -->
+            <div class="banner-container">
+                <div class="banner-left">
+                    <div class="banner-title">
+                        <span style="color: #FF6B35;">惠</span><span style="color: #4ECDC4;">有</span><span style="color: #FFD93D;">福</span>
+                    </div>
+                    <div class="banner-subtitle">农好活跃 惠享好彩</div>
+                    <button class="banner-button">立即参与 •</button>
+                </div>
+                <div class="treasure-box">🎁✨</div>
+            </div>
+
+            <!-- Main Functions Grid -->
+            <div class="main-grid">
+                <div class="grid-item">
+                    <div class="grid-icon teal"><img src="../assets/icons/svg/account.svg" alt="账户" class="grid-svg-icon"></div>
+                    <div class="grid-text">我的账户</div>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-icon orange"><img src="../assets/icons/svg/transfer.svg" alt="转账" class="grid-svg-icon"></div>
+                    <div class="grid-text">转账</div>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-icon teal"><img src="../assets/icons/svg/income-expense.svg" alt="收支" class="grid-svg-icon"></div>
+                    <div class="grid-text">收支</div>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-icon orange"><img src="../assets/icons/svg/scan.svg" alt="扫一扫" class="grid-svg-icon"></div>
+                    <div class="grid-text">扫一扫</div>
+                </div>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="services-grid">
+                <div class="service-item">
+                    <img src="../assets/icons/svg/credit-card.svg" alt="信用卡" class="service-svg-icon">
+                    <div class="service-text">信用卡</div>
+                </div>
+                <div class="service-item">
+                    <div class="new-badge">NEW</div>
+                    <img src="../assets/icons/svg/retirement-community.svg" alt="养老社区" class="service-svg-icon">
+                    <div class="service-text">养老社区</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/deposit.svg" alt="存款" class="service-svg-icon">
+                    <div class="service-text">存款</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/financial-product.svg" alt="理财产品" class="service-svg-icon">
+                    <div class="service-text">理财产品</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/loan.svg" alt="贷款" class="service-svg-icon">
+                    <div class="service-text">贷款</div>
+                </div>
+            </div>
+
+            <!-- Life Services Grid -->
+            <div class="services-grid">
+                <div class="service-item">
+                    <img src="../assets/icons/svg/bill-payment.svg" alt="生活缴费" class="service-svg-icon">
+                    <div class="service-text">生活缴费</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/hot-activity.svg" alt="热门活动" class="service-svg-icon">
+                    <div class="service-text">热门活动</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/game-park.svg" alt="小豆乐园" class="service-svg-icon">
+                    <div class="service-text">小豆乐园</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/city-zone.svg" alt="城市专区" class="service-svg-icon">
+                    <div class="service-text">城市专区</div>
+                </div>
+                <div class="service-item">
+                    <img src="../assets/icons/svg/more.svg" alt="全部" class="service-svg-icon">
+                    <div class="service-text">全部</div>
+                </div>
+            </div>
+
+            <!-- Promotion Cards -->
+            <div class="promotion-cards">
+                <div class="promotion-card">
+                    <div class="promotion-icon">📱</div>
+                    <div class="promotion-text">快来试试智能提醒吧～</div>
+                    <div class="promotion-arrow">></div>
+                </div>
+                <div class="promotion-card">
+                    <div class="promotion-icon">📰</div>
+                    <div class="promotion-text">大爆发！两大利好来袭！</div>
+                    <div class="promotion-arrow">></div>
+                </div>
+            </div>
+
+            <!-- Bottom Game Banner -->
+            <div class="game-banner">
+                <div class="game-banner-content">
+                    <div class="game-banner-title">宝雪冰淇淋霸气来</div>
+                    <button class="game-banner-button">立即抽奖</button>
+                </div>
+                <div class="game-wheel">🎯🥤</div>
+            </div>
+
+            <!-- Wealth Selection -->
+            <div class="wealth-section">
+                <div class="wealth-title">财富优选</div>
+                <div class="wealth-arrow">></div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <img src="../assets/icons/svg/home.svg" alt="首页" class="nav-svg-icon">
+                <div class="nav-text active">首页</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/wealth.svg" alt="财富" class="nav-svg-icon">
+                <div class="nav-text">财富</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/life.svg" alt="生活" class="nav-svg-icon">
+                <div class="nav-text">生活</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/rural-revitalization.svg" alt="乡村振兴" class="nav-svg-icon">
+                <div class="nav-text">乡村振兴</div>
+            </div>
+            <div class="nav-item">
+                <img src="../assets/icons/svg/profile.svg" alt="我的" class="nav-svg-icon">
+                <div class="nav-text">我的</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

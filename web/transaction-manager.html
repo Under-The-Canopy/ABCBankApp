@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易记录管理 - 中国农业银行</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-button {
+            padding: 8px;
+            cursor: pointer;
+            color: #007AFF;
+            font-size: 16px;
+            border: none;
+            background: none;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .add-button {
+            padding: 8px;
+            cursor: pointer;
+            color: #007AFF;
+            font-size: 16px;
+            border: none;
+            background: none;
+        }
+
+        /* Transaction List */
+        .transaction-list {
+            padding: 16px;
+            background: #f5f5f5;
+            min-height: calc(100vh - 70px);
+        }
+
+        .transaction-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .transaction-type {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .transaction-type.income {
+            color: #4CAF50;
+        }
+
+        .transaction-type.expense {
+            color: #F44336;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .transaction-category {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .transaction-amount.positive {
+            color: #4CAF50;
+        }
+
+        .transaction-amount.negative {
+            color: #F44336;
+        }
+
+        .transaction-description {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-button, .delete-button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .edit-button {
+            background: #4CAF50;
+        }
+
+        .delete-button {
+            background: #F44336;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtext {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .modal-cancel, .modal-save {
+            padding: 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .modal-cancel {
+            color: #666;
+        }
+
+        .modal-save {
+            color: #007AFF;
+            font-weight: 500;
+        }
+
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            background: #f9f9f9;
+        }
+
+        .form-textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 12px;
+        }
+
+        .type-button {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .type-button.active {
+            background: #007AFF;
+            border-color: #007AFF;
+            color: white;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-button" onclick="goBack()">← 返回</button>
+            <div class="header-title">交易记录管理</div>
+            <button class="add-button" onclick="showAddModal()">+ 添加</button>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="transaction-list" id="transactionList">
+            <div class="empty-state">
+                <div class="empty-text">暂无交易记录</div>
+                <div class="empty-subtext">点击右上角添加按钮开始记录</div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Modal -->
+        <div class="modal" id="transactionModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="modal-cancel" onclick="hideModal()">取消</button>
+                    <div class="modal-title" id="modalTitle">添加交易</div>
+                    <button class="modal-save" onclick="saveTransaction()">保存</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">日期</label>
+                        <input type="date" class="form-input" id="transactionDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">类型</label>
+                        <div class="type-selector">
+                            <button class="type-button active" data-type="expense" onclick="selectType('expense')">支出</button>
+                            <button class="type-button" data-type="income" onclick="selectType('income')">收入</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">分类</label>
+                        <input type="text" class="form-input" id="transactionCategory" placeholder="如：餐饮、交通、工资等">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">金额</label>
+                        <input type="number" class="form-input" id="transactionAmount" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-input form-textarea" id="transactionDescription" placeholder="可选"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let transactions = [];
+        let editingId = null;
+
+        // 初始化
+        function init() {
+            loadTransactions();
+            setDefaultDate();
+        }
+
+        // 设置默认日期
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('transactionDate').value = today;
+        }
+
+        // 加载交易记录
+        function loadTransactions() {
+            const stored = localStorage.getItem('transactions');
+            if (stored) {
+                transactions = JSON.parse(stored);
+            }
+            renderTransactions();
+        }
+
+        // 保存交易记录到本地存储
+        function saveTransactionsToStorage() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        // 渲染交易记录列表
+        function renderTransactions() {
+            const listContainer = document.getElementById('transactionList');
+
+            if (transactions.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-text">暂无交易记录</div>
+                        <div class="empty-subtext">点击右上角添加按钮开始记录</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按日期排序
+            const sortedTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const html = sortedTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-header">
+                            <span class="transaction-type ${transaction.type}">${transaction.type === 'income' ? '收入' : '支出'}</span>
+                            <span class="transaction-date">${transaction.date}</span>
+                        </div>
+                        <div class="transaction-category">${transaction.category}</div>
+                        <div class="transaction-amount ${transaction.type === 'income' ? 'positive' : 'negative'}">
+                            ${transaction.type === 'income' ? '+' : '-'}￥${transaction.amount.toFixed(2)}
+                        </div>
+                        ${transaction.description ? `<div class="transaction-description">${transaction.description}</div>` : ''}
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="edit-button" onclick="editTransaction('${transaction.id}')">编辑</button>
+                        <button class="delete-button" onclick="deleteTransaction('${transaction.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+
+            listContainer.innerHTML = html;
+        }
+
+        // 显示添加模态框
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = '添加交易';
+            resetForm();
+            showModal();
+        }
+
+        // 编辑交易
+        function editTransaction(id) {
+            const transaction = transactions.find(t => t.id === id);
+            if (!transaction) return;
+
+            editingId = id;
+            document.getElementById('modalTitle').textContent = '编辑交易';
+
+            // 填充表单
+            document.getElementById('transactionDate').value = transaction.date;
+            document.getElementById('transactionCategory').value = transaction.category;
+            document.getElementById('transactionAmount').value = transaction.amount;
+            document.getElementById('transactionDescription').value = transaction.description;
+
+            selectType(transaction.type);
+            showModal();
+        }
+
+        // 删除交易
+        function deleteTransaction(id) {
+            if (confirm('确定要删除这条交易记录吗？')) {
+                transactions = transactions.filter(t => t.id !== id);
+                saveTransactionsToStorage();
+                renderTransactions();
+            }
+        }
+
+        // 保存交易
+        function saveTransaction() {
+            const date = document.getElementById('transactionDate').value;
+            const category = document.getElementById('transactionCategory').value.trim();
+            const amount = parseFloat(document.getElementById('transactionAmount').value);
+            const description = document.getElementById('transactionDescription').value.trim();
+            const type = document.querySelector('.type-button.active').dataset.type;
+
+            if (!category || !amount || amount <= 0) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const transaction = {
+                id: editingId || Date.now().toString(),
+                date,
+                type,
+                category,
+                amount,
+                description
+            };
+
+            if (editingId) {
+                // 编辑现有交易
+                const index = transactions.findIndex(t => t.id === editingId);
+                if (index !== -1) {
+                    transactions[index] = transaction;
+                }
+            } else {
+                // 添加新交易
+                transactions.push(transaction);
+            }
+
+            saveTransactionsToStorage();
+            renderTransactions();
+            hideModal();
+        }
+
+        // 选择交易类型
+        function selectType(type) {
+            document.querySelectorAll('.type-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+        }
+
+        // 重置表单
+        function resetForm() {
+            setDefaultDate();
+            document.getElementById('transactionCategory').value = '';
+            document.getElementById('transactionAmount').value = '';
+            document.getElementById('transactionDescription').value = '';
+            selectType('expense');
+        }
+
+        // 显示模态框
+        function showModal() {
+            document.getElementById('transactionModal').classList.add('show');
+        }
+
+        // 隐藏模态框
+        function hideModal() {
+            document.getElementById('transactionModal').classList.remove('show');
+            resetForm();
+        }
+
+        // 返回上一页
+        function goBack() {
+            window.history.back();
+        }
+
+        // 点击模态框背景关闭
+        document.getElementById('transactionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideModal();
+            }
+        });
+
+        // 初始化页面
+        init();
+    </script>
+</body>
+</html>

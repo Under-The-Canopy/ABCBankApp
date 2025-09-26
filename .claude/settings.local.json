@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(pod install:*)",
+      "Bash(python:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm start)",
+      "Bash(npm run android:*)",
+      "Bash(start:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

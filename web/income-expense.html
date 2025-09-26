@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收支 - 中国农业银行</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: #F2F2F7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: #F2F2F7;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid #E5E5EA;
+        }
+
+        .back-button {
+            font-size: 18px;
+            color: #007AFF;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .search-button {
+            font-size: 18px;
+            color: #007AFF;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .more-button {
+            font-size: 18px;
+            color: #8E8E93;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            background: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 0.5px solid #E5E5EA;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .filter-text {
+            font-size: 15px;
+            color: #1D1D1F;
+            margin-right: 4px;
+        }
+
+        .filter-arrow {
+            font-size: 12px;
+            color: #8E8E93;
+        }
+
+        .filter-highlight {
+            color: #007AFF;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: linear-gradient(135deg, #FFF8E1, #FFFBF0);
+            margin: 16px 20px;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .month-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1D1D1F;
+            margin-right: 8px;
+        }
+
+        .year-text {
+            font-size: 16px;
+            color: #8E8E93;
+            margin-right: 8px;
+        }
+
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            color: #8E8E93;
+        }
+
+        .analyze-button {
+            background: #FF9500;
+            border: none;
+            border-radius: 16px;
+            padding: 6px 12px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .summary-amounts {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .amount-section {
+            flex: 1;
+        }
+
+        .amount-label {
+            font-size: 14px;
+            color: #8E8E93;
+            margin-bottom: 4px;
+        }
+
+        .amount-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .expense-value {
+            color: #1D1D1F;
+        }
+
+        .income-value {
+            color: #1D1D1F;
+        }
+
+        /* Transaction List */
+        .transaction-list {
+            background: white;
+            margin: 0;
+            border-radius: 0;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .date-section {
+            background: #F2F2F7;
+            padding: 8px 20px;
+            border-bottom: 0.5px solid #E5E5EA;
+        }
+
+        .date-text {
+            font-size: 13px;
+            color: #8E8E93;
+            font-weight: 500;
+        }
+
+        .transaction-item {
+            padding: 16px 20px;
+            border-bottom: 0.5px solid #E5E5EA;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            min-height: 70px;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .income-icon {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .expense-icon {
+            background: #F44336;
+            color: white;
+        }
+
+        .transaction-info {
+            flex: 1;
+            margin-right: 16px;
+        }
+
+        .transaction-name {
+            font-size: 16px;
+            color: #1D1D1F;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .transaction-details {
+            font-size: 13px;
+            color: #8E8E93;
+            margin-top: 4px;
+        }
+
+        .amount-balance {
+            font-size: 13px;
+            color: #8E8E93;
+            margin-top: 2px;
+        }
+
+        .transaction-amount {
+            text-align: right;
+            min-width: 100px;
+            margin-right: 8px;
+        }
+
+        .amount-main {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1D1D1F;
+            margin-bottom: 2px;
+        }
+
+        .amount-negative {
+            color: #F44336;
+        }
+
+        .amount-positive {
+            color: #4CAF50;
+        }
+
+        .amount-balance {
+            font-size: 13px;
+            color: #8E8E93;
+        }
+
+        .transaction-arrow {
+            font-size: 16px;
+            color: #C7C7CC;
+            margin-left: 8px;
+        }
+
+        /* Bottom spacing */
+        .bottom-spacing {
+            height: 100px;
+        }
+
+        /* Home Indicator */
+        .home-indicator {
+            position: fixed;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #1D1D1F;
+            border-radius: 3px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        /* Time Filter Modal */
+        .time-filter-modal {
+            background: white;
+            width: 100%;
+            max-width: 375px;
+            border-radius: 16px 16px 0 0;
+            padding: 0;
+            max-height: 60vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 0.5px solid #E5E5EA;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-cancel, .modal-confirm {
+            font-size: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .modal-cancel {
+            color: #8E8E93;
+        }
+
+        .modal-confirm {
+            color: #FF9500;
+            font-weight: 600;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .filter-notice {
+            background: #FFF8E1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #8E8E93;
+            text-align: center;
+        }
+
+        .filter-notice a {
+            color: #FF9500;
+            text-decoration: none;
+        }
+
+        .filter-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #8E8E93;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .filter-tab.active {
+            color: #1D1D1F;
+            font-weight: 600;
+            border-bottom-color: #FF9500;
+        }
+
+        .picker-container {
+            display: flex;
+            height: 200px;
+            background: #F2F2F7;
+            border-radius: 8px;
+            overflow: hidden;
+            gap: 4px;
+            position: relative;
+        }
+
+        .picker-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .picker-label {
+            font-size: 14px;
+            color: #8E8E93;
+            padding: 10px 0;
+            font-weight: 500;
+            background: #F2F2F7;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .picker-scroll {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        .picker-scroll::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        /* 中央选中指示器 */
+        .picker-scroll::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 40px;
+            transform: translateY(-50%);
+            background: rgba(255, 149, 0, 0.1);
+            border-top: 1px solid rgba(255, 149, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 149, 0, 0.2);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .picker-item {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #8E8E93;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .picker-item:hover {
+            background-color: rgba(255, 149, 0, 0.05);
+        }
+
+        .picker-item.selected {
+            color: #FF9500;
+            font-weight: 600;
+            background-color: transparent;
+        }
+
+        /* 添加渐变遮罩效果 */
+        .picker-column::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(242, 242, 247, 0.8) 0%,
+                transparent 20%,
+                transparent 80%,
+                rgba(242, 242, 247, 0.8) 100%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* Transaction item selected state */
+        .transaction-item.selected {
+            background-color: #F2F2F7;
+            position: relative;
+        }
+
+        .transaction-delete {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #FF3B30;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+        }
+
+        .transaction-item.selected .transaction-delete {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="back-button" onclick="goBack()">‹</div>
+            <div class="header-title">收支</div>
+            <div style="display: flex; gap: 16px;">
+                <div class="search-button">🔍</div>
+                <div class="more-button">⋯</div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-controls">
+            <div class="filter-item" onclick="showTimeFilter()">
+                <span class="filter-text filter-highlight" id="selectedTime">2025-09</span>
+                <span class="filter-arrow">▼</span>
+            </div>
+            <div class="filter-item">
+                <span class="filter-text">全部账户</span>
+                <span class="filter-arrow">▼</span>
+            </div>
+            <div class="filter-item">
+                <span class="filter-text filter-highlight">筛选</span>
+                <span class="filter-arrow">▼</span>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card">
+            <div class="summary-header">
+                <span class="month-text">9</span>
+                <span class="month-text">月</span>
+                <span class="year-text">/2025</span>
+                <span class="info-icon">ⓘ</span>
+                <button class="analyze-button">分析</button>
+            </div>
+            <div class="summary-amounts">
+                <div class="amount-section">
+                    <div class="amount-label">支出(元)</div>
+                    <div class="amount-value expense-value">490,991.58</div>
+                </div>
+                <div class="amount-section" style="text-align: right;">
+                    <div class="amount-label">收入(元)</div>
+                    <div class="amount-value income-value">380,460.73</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="transaction-list">
+            <div class="date-section">
+                <div class="date-text">25日</div>
+            </div>
+            <div class="transaction-item">
+                <div class="transaction-icon alipay-icon">支</div>
+                <div class="transaction-info">
+                    <div class="transaction-name">支付宝(蚂蚁...</div>
+                    <div class="transaction-details">借记卡1179 01:20</div>
+                </div>
+                <div class="transaction-amount">
+                    <div class="amount-main amount-negative">- ¥ 200.00</div>
+                    <div class="amount-balance">余额：¥ 316.45</div>
+                </div>
+                <div class="transaction-arrow">›</div>
+            </div>
+
+            <div class="date-section">
+                <div class="date-text">23日</div>
+            </div>
+            <div class="transaction-item">
+                <div class="transaction-icon wechat-icon">财</div>
+                <div class="transaction-info">
+                    <div class="transaction-name">财付通(微信支...</div>
+                    <div class="transaction-details">借记卡1179 18:39</div>
+                </div>
+                <div class="transaction-amount">
+                    <div class="amount-main amount-negative">- ¥ 27.00</div>
+                    <div class="amount-balance">余额：¥ 516.45</div>
+                </div>
+                <div class="transaction-arrow">›</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-icon meituan-icon">美</div>
+                <div class="transaction-info">
+                    <div class="transaction-name">美团支付(美团A...</div>
+                    <div class="transaction-details">借记卡1179 15:41</div>
+                </div>
+                <div class="transaction-amount">
+                    <div class="amount-main amount-negative">- ¥ 110.50</div>
+                    <div class="amount-balance">余额：¥ 543.45</div>
+                </div>
+                <div class="transaction-arrow">›</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-icon alipay-icon">支</div>
+                <div class="transaction-info">
+                    <div class="transaction-name">支付宝(蚂蚁...</div>
+                    <div class="transaction-details">借记卡1179 09:15</div>
+                </div>
+                <div class="transaction-amount">
+                    <div class="amount-main amount-negative">- ¥ 50.00</div>
+                    <div class="amount-balance">余额：¥ 653.95</div>
+                </div>
+                <div class="transaction-arrow">›</div>
+            </div>
+
+            <div class="date-section">
+                <div class="date-text">22日</div>
+            </div>
+            <div class="transaction-item">
+                <div class="transaction-icon wechat-icon">财</div>
+                <div class="transaction-info">
+                    <div class="transaction-name">财付通(微信支...</div>
+                    <div class="transaction-details">借记卡1179 21:24</div>
+                </div>
+                <div class="transaction-amount">
+                    <div class="amount-main amount-negative">- ¥ 300.00</div>
+                    <div class="amount-balance">余额：¥ 703.95</div>
+                </div>
+                <div class="transaction-arrow">›</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-icon meituan-icon">美</div>
+                <div class="transaction-info">
+                    <div class="transaction-name">美团支付(美团A...</div>
+                    <div class="transaction-details">借记卡1179 18:54</div>
+                </div>
+                <div class="transaction-amount">
+                    <div class="amount-main amount-negative">- ¥ 34.90</div>
+                    <div class="amount-balance">余额：¥ 1,003.95</div>
+                </div>
+                <div class="transaction-arrow">›</div>
+            </div>
+        </div>
+
+        <div class="bottom-spacing"></div>
+
+        <!-- Home Indicator -->
+        <div class="home-indicator"></div>
+    </div>
+
+    <!-- Time Filter Modal -->
+    <div class="modal-overlay" id="timeFilterModal">
+        <div class="time-filter-modal">
+            <div class="modal-header">
+                <button class="modal-cancel" onclick="hideTimeFilter()">取消</button>
+                <span class="modal-title"></span>
+                <button class="modal-confirm" onclick="confirmTimeFilter()">确定</button>
+            </div>
+            <div class="modal-content">
+                <div class="filter-notice">
+                    若查询时间为2021年1月之前，请 <a href="#">点击此处</a> 跳转至明细
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="switchTab('month')">月份选择</button>
+                    <button class="filter-tab" onclick="switchTab('custom')">自定义</button>
+                </div>
+                <div class="picker-container" id="pickerContainer">
+                    <div class="picker-column">
+                        <div class="picker-label">年份</div>
+                        <div class="picker-scroll" id="yearPicker">
+                            <div class="picker-item" data-value="2022">2022</div>
+                            <div class="picker-item" data-value="2023">2023</div>
+                            <div class="picker-item" data-value="2024">2024</div>
+                            <div class="picker-item selected" data-value="2025">2025</div>
+                            <div class="picker-item" data-value="2026">2026</div>
+                        </div>
+                    </div>
+                    <div class="picker-column">
+                        <div class="picker-label">月份</div>
+                        <div class="picker-scroll" id="monthPicker">
+                            <div class="picker-item" data-value="1">1月</div>
+                            <div class="picker-item" data-value="2">2月</div>
+                            <div class="picker-item" data-value="3">3月</div>
+                            <div class="picker-item" data-value="4">4月</div>
+                            <div class="picker-item" data-value="5">5月</div>
+                            <div class="picker-item" data-value="6">6月</div>
+                            <div class="picker-item" data-value="7">7月</div>
+                            <div class="picker-item" data-value="8">8月</div>
+                            <div class="picker-item selected" data-value="9">9月</div>
+                            <div class="picker-item" data-value="10">10月</div>
+                            <div class="picker-item" data-value="11">11月</div>
+                            <div class="picker-item" data-value="12">12月</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let transactionData = [];
+        let currentFilter = { year: 2025, month: 9 };
+        let selectedFilter = { year: 2025, month: 9 };
+        let selectedTransactionId = null;
+
+        // 初始化数据
+        function initializeData() {
+            const savedData = localStorage.getItem('transactions');
+            if (savedData) {
+                const storedTransactions = JSON.parse(savedData);
+                // 转换数据格式以适应收支页面显示
+                transactionData = storedTransactions.map(transaction => ({
+                    id: transaction.id,
+                    date: transaction.date,
+                    name: transaction.category,
+                    type: transaction.type === 'expense' ? 'expense' : 'income',
+                    amount: transaction.type === 'expense' ? -transaction.amount : transaction.amount,
+                    description: transaction.description
+                }));
+            } else {
+                // 没有存储的数据时，初始化为空数组
+                transactionData = [];
+            }
+        }
+
+        // 删除交易时不需要保存，因为我们不再使用web端的数据存储
+        // 数据统一由transaction-manager页面管理
+
+        // 删除交易记录
+        function deleteTransaction(id) {
+            if (confirm('确定要删除这条交易记录吗？')) {
+                // 从localStorage的transactions中删除
+                const savedData = localStorage.getItem('transactions');
+                if (savedData) {
+                    let storedTransactions = JSON.parse(savedData);
+                    storedTransactions = storedTransactions.filter(t => t.id !== id);
+                    localStorage.setItem('transactions', JSON.stringify(storedTransactions));
+                }
+
+                // 更新显示数据
+                transactionData = transactionData.filter(t => t.id !== id);
+                selectedTransactionId = null; // 删除后取消选中状态
+                renderTransactions();
+                updateSummary();
+            }
+        }
+
+        // 筛选数据
+        function getFilteredData() {
+            return transactionData.filter(t => {
+                const date = new Date(t.date);
+                return date.getFullYear() === currentFilter.year && 
+                       date.getMonth() + 1 === currentFilter.month;
+            });
+        }
+
+        // 渲染交易记录
+        function renderTransactions() {
+            const filteredData = getFilteredData();
+            const transactionList = document.querySelector('.transaction-list');
+            
+            // 按日期分组
+            const groupedData = {};
+            filteredData.forEach(t => {
+                const day = new Date(t.date).getDate();
+                if (!groupedData[day]) {
+                    groupedData[day] = [];
+                }
+                groupedData[day].push(t);
+            });
+
+            // 生成HTML
+            let html = '';
+            Object.keys(groupedData).sort((a, b) => b - a).forEach(day => {
+                html += `<div class="date-section"><div class="date-text">${day}日</div></div>`;
+                groupedData[day].forEach(t => {
+                    const iconClass = t.type === 'income' ? 'income-icon' : 'expense-icon';
+                    const iconText = t.type === 'income' ? '收' : '支';
+                    
+                    html += `
+                        <div class="transaction-item" onclick="selectTransaction(${t.id})">
+                            <div class="transaction-icon ${iconClass}">${iconText}</div>
+                            <div class="transaction-info">
+                                <div class="transaction-name">${t.name}</div>
+                                <div class="transaction-details">${t.description || '无备注'}</div>
+                            </div>
+                            <div class="transaction-amount">
+                                <div class="amount-main ${t.amount > 0 ? 'amount-positive' : 'amount-negative'}">${t.amount > 0 ? '+' : ''} ¥ ${Math.abs(t.amount).toFixed(2)}</div>
+                                <div class="amount-balance">${t.type === 'income' ? '收入' : '支出'}</div>
+                            </div>
+                            <button class="transaction-delete" onclick="event.stopPropagation(); deleteTransaction(${t.id})">删除</button>
+                            <div class="transaction-arrow">›</div>
+                        </div>
+                    `;
+                });
+            });
+
+            transactionList.innerHTML = html;
+        }
+
+        // 更新汇总信息
+        function updateSummary() {
+            const filteredData = getFilteredData();
+            const totalExpense = filteredData.filter(t => t.amount < 0)
+                                           .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            const totalIncome = filteredData.filter(t => t.amount > 0)
+                                          .reduce((sum, t) => sum + t.amount, 0);
+
+            document.querySelector('.expense-value').textContent = totalExpense.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.querySelector('.income-value').textContent = totalIncome.toLocaleString('en-US', {minimumFractionDigits: 2});
+            
+            // 更新月份显示
+            document.querySelector('.month-text').textContent = currentFilter.month;
+            document.querySelector('.year-text').textContent = `/${currentFilter.year}`;
+        }
+
+        // 时间筛选相关功能
+        function showTimeFilter() {
+            selectedFilter = { ...currentFilter };
+            document.getElementById('timeFilterModal').classList.add('show');
+            // 初始化选择器位置
+            setTimeout(initializePickerPositions, 100);
+        }
+
+        function hideTimeFilter() {
+            document.getElementById('timeFilterModal').classList.remove('show');
+        }
+
+        // 选择年份或月份
+        function selectPickerItem(element, type) {
+            // 移除同类型的其他选中状态
+            const container = type === 'year' ? document.getElementById('yearPicker') : document.getElementById('monthPicker');
+            container.querySelectorAll('.picker-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 设置新选中状态
+            element.classList.add('selected');
+            
+            // 更新选择的值
+            const value = parseInt(element.dataset.value);
+            if (type === 'year') {
+                selectedFilter.year = value;
+            } else {
+                selectedFilter.month = value;
+            }
+        }
+
+        // 初始化选择器滚动位置
+        function initializePickerPositions() {
+            // 滚动年份选择器到选中位置
+            const selectedYear = document.querySelector('#yearPicker .picker-item.selected');
+            if (selectedYear) {
+                const yearPicker = document.getElementById('yearPicker');
+                const itemHeight = 40;
+                const containerHeight = yearPicker.clientHeight;
+                const selectedIndex = Array.from(yearPicker.children).indexOf(selectedYear);
+                const scrollTop = selectedIndex * itemHeight - containerHeight / 2 + itemHeight / 2;
+                yearPicker.scrollTop = Math.max(0, scrollTop);
+            }
+
+            // 滚动月份选择器到选中位置
+            const selectedMonth = document.querySelector('#monthPicker .picker-item.selected');
+            if (selectedMonth) {
+                const monthPicker = document.getElementById('monthPicker');
+                const itemHeight = 40;
+                const containerHeight = monthPicker.clientHeight;
+                const selectedIndex = Array.from(monthPicker.children).indexOf(selectedMonth);
+                const scrollTop = selectedIndex * itemHeight - containerHeight / 2 + itemHeight / 2;
+                monthPicker.scrollTop = Math.max(0, scrollTop);
+            }
+        }
+
+        // 初始化选择器交互
+        function initializePickers() {
+            // 年份选择器事件
+            document.getElementById('yearPicker').addEventListener('click', function(e) {
+                if (e.target.classList.contains('picker-item')) {
+                    selectPickerItem(e.target, 'year');
+                    scrollToCenter(e.target, 'year');
+                }
+            });
+            
+            // 月份选择器事件
+            document.getElementById('monthPicker').addEventListener('click', function(e) {
+                if (e.target.classList.contains('picker-item')) {
+                    selectPickerItem(e.target, 'month');
+                    scrollToCenter(e.target, 'month');
+                }
+            });
+        }
+
+        // 滚动选中项到中央
+        function scrollToCenter(element, type) {
+            const container = type === 'year' ? document.getElementById('yearPicker') : document.getElementById('monthPicker');
+            const itemHeight = 40;
+            const containerHeight = container.clientHeight;
+            const selectedIndex = Array.from(container.children).indexOf(element);
+            const scrollTop = selectedIndex * itemHeight - containerHeight / 2 + itemHeight / 2;
+            
+            container.scrollTo({
+                top: Math.max(0, scrollTop),
+                behavior: 'smooth'
+            });
+        }
+
+        function confirmTimeFilter() {
+            currentFilter = { ...selectedFilter };
+            document.getElementById('selectedTime').textContent = `${currentFilter.year}-${String(currentFilter.month).padStart(2, '0')}`;
+            hideTimeFilter();
+            renderTransactions();
+            updateSummary();
+        }
+
+        // 选择交易项目
+        function selectTransaction(id) {
+            // 移除之前选中的项目
+            document.querySelectorAll('.transaction-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 如果点击的是已选中的项目，取消选择
+            if (selectedTransactionId === id) {
+                selectedTransactionId = null;
+            } else {
+                // 选中新项目
+                selectedTransactionId = id;
+                event.currentTarget.classList.add('selected');
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            // 这里可以添加自定义时间选择的逻辑
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            initializeData();
+            renderTransactions();
+            updateSummary();
+            initializePickers();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,23 @@
+{
+  "name": "ABCBankApp",
+  "displayName": "中国农业银行",
+  "expo": {
+    "name": "中国农业银行",
+    "slug": "abc-bank-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#ffffff",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.abcbank.app"
+    },
+    "android": {
+      "package": "com.abcbank.app"
+    }
+  }
+}
