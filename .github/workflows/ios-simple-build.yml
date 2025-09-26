@@ -87,6 +87,17 @@ jobs:
           exit 1
         fi
 
+    - name: Patch Boost Podspec URL (stabilize download)
+      run: |
+        echo "🔧 修补boost.podspec下载源为稳定镜像..."
+        BOOST_PODSPEC="node_modules/react-native/third-party-podspecs/boost.podspec"
+        if [ -f "$BOOST_PODSPEC" ]; then
+          sed -i '' "s#https://boostorg.jfrog.io/artifactory/main/release#https://archives.boost.io/release#g" "$BOOST_PODSPEC" || true
+          echo "✅ 已修补boost.podspec"
+        else
+          echo "⚠️ 未找到$BOOST_PODSPEC"
+        fi
+
     - name: Install CocoaPods Dependencies
       run: |
         cd ios
