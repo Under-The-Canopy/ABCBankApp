@@ -58,7 +58,7 @@ jobs:
         if [ -f "ABCBankApp.xcworkspace" ]; then
           echo "Using xcworkspace"
           xcodebuild -workspace ABCBankApp.xcworkspace \
-                     -scheme ABCBankApp \
+                     -scheme HelloWorld \
                      -configuration Release \
                      -destination 'platform=iOS Simulator,name=iPhone 14' \
                      -derivedDataPath ./build \
@@ -66,7 +66,7 @@ jobs:
         else
           echo "Using xcodeproj"
           xcodebuild -project ABCBankApp.xcodeproj \
-                     -scheme ABCBankApp \
+                     -scheme HelloWorld \
                      -configuration Release \
                      -destination 'platform=iOS Simulator,name=iPhone 14' \
                      -derivedDataPath ./build \
@@ -76,12 +76,13 @@ jobs:
     - name: Package App
       run: |
         cd ios/build/Build/Products/Release-iphonesimulator/
-        if [ -d "ABCBankApp.app" ]; then
-          zip -r ABCBankApp-Simulator.zip ABCBankApp.app
+        if [ -d "HelloWorld.app" ]; then
+          zip -r ABCBankApp-Simulator.zip HelloWorld.app
           echo "✅ App packaged successfully"
           ls -la ABCBankApp-Simulator.zip
         else
           echo "❌ App build failed - .app file not found"
+          echo "Available files:"
           ls -la
           exit 1
         fi
