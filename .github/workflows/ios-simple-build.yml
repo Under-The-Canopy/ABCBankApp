@@ -58,6 +58,9 @@ jobs:
           echo "✅ 创建了基础bundle文件"
         fi
 
+        # 同步一份到根目录，供Xcode脚本兜底使用
+        cp ios/main.jsbundle ./main.jsbundle || true
+
         # 检查bundle文件
         if [ -f "ios/main.jsbundle" ]; then
           echo "📊 Bundle文件大小: $(du -sh ios/main.jsbundle)"
@@ -243,28 +246,6 @@ jobs:
           fi
         fi
 
-        # 验证选择的scheme是否存在
-        echo "🔍 验证scheme: $SELECTED_SCHEME"
-        if [ "$USE_WORKSPACE" = "true" ]; then
-          if xcodebuild -workspace "$XCODE_FILE" -list | grep -q "$SELECTED_SCHEME"; then
-            echo "✅ Scheme验证通过: $SELECTED_SCHEME"
-          else
-            echo "❌ Scheme不存在: $SELECTED_SCHEME"
-            echo "🔄 回退到第一个可用scheme"
-            SELECTED_SCHEME=$(xcodebuild -workspace "$XCODE_FILE" -list 2>/dev/null | grep -A 10 "Schemes:" | grep -v "Schemes:" | head -1 | xargs)
-            echo "🎯 使用回退scheme: $SELECTED_SCHEME"
-          fi
-        else
-          if xcodebuild -project "$XCODE_FILE" -list | grep -q "$SELECTED_SCHEME"; then
-            echo "✅ Scheme验证通过: $SELECTED_SCHEME"
-          else
-            echo "❌ Scheme不存在: $SELECTED_SCHEME"
-            echo "🔄 回退到第一个可用scheme"
-            SELECTED_SCHEME=$(xcodebuild -project "$XCODE_FILE" -list 2>/dev/null | grep -A 10 "Schemes:" | grep -v "Schemes:" | head -1 | xargs)
-            echo "🎯 使用回退scheme: $SELECTED_SCHEME"
-          fi
-        fi
-
         # 构建应用 - 使用Generic iOS Device目标
         echo "🔨 开始构建iOS应用 (真机版本)..."
         echo "🎯 最终使用的scheme: $SELECTED_SCHEME"
@@ -427,6 +408,7 @@ jobs:
           *.zip
           *.ipa
           ios/main.jsbundle
+          main.jsbundle
           ios/build/Build/Products/Release-iphoneos/
         retention-days: 30
 
