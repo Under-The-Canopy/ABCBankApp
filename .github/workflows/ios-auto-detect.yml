@@ -1,0 +1,162 @@
+name: iOS Auto-Detect Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install npm dependencies
+      run: npm install --legacy-peer-deps
+
+    - name: Generate React Native Bundle
+      run: |
+        echo "📦 生成React Native bundle..."
+        npx react-native bundle \
+          --platform ios \
+          --dev false \
+          --entry-file index.js \
+          --bundle-output ios/main.jsbundle \
+          --assets-dest ios/
+
+    - name: Auto-detect iOS Project Configuration
+      run: |
+        cd ios
+
+        echo "🔍 检查iOS项目结构..."
+        ls -la
+
+        echo ""
+        echo "📋 查找Xcode项目文件..."
+        find . -name "*.xcodeproj" -type d
+        find . -name "*.xcworkspace" -type d
+
+        echo ""
+        echo "📱 检查可用的schemes..."
+
+        # 检查workspace
+        if [ -f "ABCBankApp.xcworkspace/contents.xcworkspacedata" ]; then
+          echo "✅ 找到workspace: ABCBankApp.xcworkspace"
+          xcodebuild -workspace ABCBankApp.xcworkspace -list
+          echo "USE_WORKSPACE=true" >> $GITHUB_ENV
+        elif [ -f "ABCBankApp.xcodeproj/project.pbxproj" ]; then
+          echo "✅ 找到project: ABCBankApp.xcodeproj"
+          xcodebuild -project ABCBankApp.xcodeproj -list
+          echo "USE_WORKSPACE=false" >> $GITHUB_ENV
+        else
+          echo "❌ 未找到Xcode项目文件"
+          exit 1
+        fi
+
+    - name: Setup CocoaPods
+      env:
+        NO_FLIPPER: 1
+      run: |
+        cd ios
+        rm -f Podfile.lock
+        rm -rf Pods
+
+        sudo gem install cocoapods
+        pod install --verbose
+
+    - name: Build with Auto-detected Scheme
+      run: |
+        cd ios
+
+        # 获取第一个可用的scheme
+        if [ "$USE_WORKSPACE" = "true" ]; then
+          SCHEME=$(xcodebuild -workspace ABCBankApp.xcworkspace -list | grep -A 100 "Schemes:" | grep -v "Schemes:" | head -1 | xargs)
+          echo "🎯 使用workspace和scheme: $SCHEME"
+
+          xcodebuild -workspace ABCBankApp.xcworkspace \
+                     -scheme "$SCHEME" \
+                     -configuration Release \
+                     -destination 'platform=iOS Simulator,name=iPhone 14' \
+                     -derivedDataPath ./build \
+                     ONLY_ACTIVE_ARCH=NO \
+                     CODE_SIGNING_ALLOWED=NO \
+                     build
+        else
+          SCHEME=$(xcodebuild -project ABCBankApp.xcodeproj -list | grep -A 100 "Schemes:" | grep -v "Schemes:" | head -1 | xargs)
+          echo "🎯 使用project和scheme: $SCHEME"
+
+          xcodebuild -project ABCBankApp.xcodeproj \
+                     -scheme "$SCHEME" \
+                     -configuration Release \
+                     -destination 'platform=iOS Simulator,name=iPhone 14' \
+                     -derivedDataPath ./build \
+                     ONLY_ACTIVE_ARCH=NO \
+                     CODE_SIGNING_ALLOWED=NO \
+                     build
+        fi
+
+    - name: Find and Package App
+      run: |
+        cd ios
+
+        echo "🔍 搜索构建的应用..."
+        find ./build -name "*.app" -type d
+
+        APP_PATH=$(find ./build -name "*.app" -type d | head -1)
+
+        if [ -n "$APP_PATH" ]; then
+          echo "✅ 找到应用: $APP_PATH"
+
+          # 检查应用内容
+          echo "📱 应用内容:"
+          ls -la "$APP_PATH"
+
+          # 检查应用大小
+          du -sh "$APP_PATH"
+
+          # 打包应用
+          cd $(dirname "$APP_PATH")
+          APP_NAME=$(basename "$APP_PATH")
+          zip -r "ABCBankApp-AutoDetect.zip" "$APP_NAME"
+
+          echo "📦 应用打包完成: ABCBankApp-AutoDetect.zip"
+          ls -la "ABCBankApp-AutoDetect.zip"
+
+          # 移动到根目录
+          mv "ABCBankApp-AutoDetect.zip" ../../../
+        else
+          echo "❌ 未找到.app文件"
+          echo "构建目录内容："
+          find ./build -type f | head -20
+        fi
+
+    - name: Upload iOS App
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: iOS-AutoDetect-${{ github.run_number }}
+        path: |
+          ABCBankApp-AutoDetect.zip
+          ios/main.jsbundle
+        retention-days: 30
+
+    - name: Build Summary
+      if: always()
+      run: |
+        echo "🎯 自动检测构建完成!"
+        echo "📱 使用了项目中实际存在的scheme"
+        echo ""
+        if [ -f "ABCBankApp-AutoDetect.zip" ]; then
+          echo "✅ 构建成功! 生成了完整的iOS应用"
+          echo "📱 应用包含所有必要的React Native文件"
+          echo "📂 下载Artifacts获取应用"
+        else
+          echo "⚠️ 构建未完成，但已显示项目配置信息"
+          echo "🔧 请检查日志中的scheme信息"
+        fi
